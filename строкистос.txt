@@ -1,0 +1,113 @@
+ org 100h
+EntryPoint:
+        mov     di, stroka     ;   вносим в   di адрес строки, по которой ищем символы
+
+        mov     dx, yourStr    ;  выводим исходную строку
+        call    OutHello       ;
+        mov     dx, stroka     ;
+        call    OutHello       ;
+
+        mov     dx,HelloC      ;   выводим запрос на первый символ
+        call    OutHello        ;
+        call    InputSymbol      ;   ввод первого символа
+        call    SearchNumElement ;   поиск его местоположения в строке
+        mov     bh,al            ;   сохраняем это самое местоположение в bh
+
+
+        mov     dx,HelloB           ;выводим запрос на второй символ
+        call    OutHello             ;
+        call    InputSymbol           ;ввод второго символа
+        call    SearchNumElement       ;поиск его местоположения в строке
+        mov     bl,al                   ;сохраняем местоположение в bl
+
+        mov     dx, GoodBye         ; вывод интерфейсной строки
+        call    OutHello             ;
+        call    Distance            ;поиск расстояния и его вывод
+
+        mov     ax, $0C08           ; ожидание символа
+        int     21h
+        test    al, al
+        jnz     EndPoint
+        mov     ah, $08
+        int     21h
+
+EndPoint:
+        ret
+
+stroka  db      'awedfgbjzcml','$'
+yourStr db      'Your string: ',13,10,'$'
+HelloC  db      13,10,'Input first symbol: $'
+HelloB  db      13,10,'Input second symbol: $'
+GoodBye db      13,10,'Distance between symbols $'
+
+
+SearchNumElement:                    ;
+
+        push    di
+        mov     cx,12
+        mov     dx,di
+        repne   scasb
+        mov     cx,di
+        dec     cx
+        sub     cx,dx
+        xor     ax,ax
+        mov     al,cl
+        pop     di
+        ret
+
+OutHello:
+        xor     ax,ax
+        mov     ah,09h
+        int     21h
+        ret
+
+InputSymbol:
+        mov     ah,01h
+        int     21h
+        ret
+
+Distance:
+        sub     bl,bh
+        cmp     bl, 0
+        jg     .EndDistance
+
+.Inverse:
+        xor     bl,11111111b
+        add     bl,1
+.EndDistance:
+        mov     cx,1
+        mov     dl,bl
+        cmp     dl,9
+        jng     .IfNotGreater
+
+        mov     cx,2
+        movzx   ax,dl
+        mov     bl,10
+@@:
+        div     bl
+        movzx   dx,ah
+        push    dx
+        mov     ah,0
+        loop    @B
+
+        mov     cx,2
+@@:
+        pop     dx
+        call    Output
+        loop    @B
+        jmp     .EndProc
+
+.IfNotGreater:
+        call    Output
+
+.EndProc:
+        ret
+
+Output:
+
+        add     dl,30h
+        mov     ah,02
+        int     21h
+        ret
+
+

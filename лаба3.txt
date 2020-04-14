@@ -1,0 +1,42 @@
+org 100h
+
+        mov di,somearr
+        mov [newarr],0
+        mov [coh],0
+        mov [col],0
+ org 100h
+        mov di, somearr
+        mov cx, 0
+        mov al, 0
+
+Oper1:
+         mov bx,di
+         add bx,cx
+         mov dl,[bx]
+
+         mov ah,02
+         int 21h
+
+        inc al
+        add cx,2
+        cmp cx,9
+        jb Oper1
+
+EndOutput:
+        mov dx,somestr
+        mov ah,09h
+        int 21h
+
+        mov [number],al
+        add [number],11h
+        mov dl,[number]
+        mov ah,02h
+        int 21h
+
+        mov ah,0ah
+        int 21h
+        ret
+
+somearr         db 'hie2l3l4o'
+somestr         db 10,13,'number of elements is: ','$'
+number          db ?

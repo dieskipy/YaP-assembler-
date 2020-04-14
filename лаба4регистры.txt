@@ -1,0 +1,190 @@
+format  MZ
+entry   Main:Start
+
+Segment Main
+
+Start:
+        mov     ax, Main
+        mov     ds, ax
+
+InputC:
+        mov     di, StComC
+        call    OutStr
+
+        mov     di, C
+        call    InStr
+
+        mov     si, C
+        call    StrToInt
+        mov     cx, ax
+
+        call    Newline
+
+InputD:
+        mov     di, StComD
+        call    OutStr
+
+        mov     di, D
+        call    InStr
+
+        mov     si, D
+        call    StrToInt
+        mov     bx, ax
+
+        call    Newline
+
+Calculations:
+        call far MyProc:Calc
+
+        mov     di, Expression
+        call    OutStr
+
+        call    OutInt
+
+        call    PAK
+
+        mov     ax, 4C00h
+        int     21h
+;/////////////////////////////////////////////////;
+StComC:         db      "Enter number C : $"
+C               db      10, 0, 10 dup ?
+
+StComD:         db      "Enter number D : $"
+D               db      10, 0, 10 dup ?
+
+Expression      db      "C/(D^2+1)+1= $"
+
+Press           db      "Press any key...$"
+bufO            db      10, 0, 10 dup ?
+;/////////////////////////////////////////////////;
+
+StrToInt:
+        push    dx
+        push    bx
+        push    cx
+        push    di
+
+        xor     dh, dh
+        xor     ax, ax
+        xor     ch, ch
+        xor     bx,bx
+        mov     di, 10
+        mov     cl, [si+1]
+        add     si, 2
+
+@@:
+        mov     bl, [si]
+        inc     si
+        sub     bx, 30h
+        mul     di
+        add     ax,bx
+        loop    @B
+
+        pop     di
+        pop     cx
+        pop     bx
+        pop     dx
+ret
+
+OutInt:         ;Вывод числа на консоль
+        push    dx
+        push    bx
+        push    cx
+        push    di
+
+        xor     si, si
+        xor     cx, cx
+        mov     bl, 10
+
+PartOne:
+        div     bl
+        movzx   dx, ah
+        push    dx
+        movzx   ax, al
+        Inc     cx
+        cmp     ax, 0
+        jnz     PartOne
+
+PartTwo:
+        pop     dx
+        add     dl, '0'
+        mov     [bufO+si], dl
+        Inc     si
+        loop    PartTwo
+        mov     [bufO+si], "$"
+
+        mov     di, bufO
+        call    OutStr
+
+        pop     di
+        pop     cx
+        pop     bx
+        pop     dx
+ret
+
+PAK:            ;Завершение программы
+        call    Newline
+
+        mov     di, Press
+        call    OutStr
+
+        mov     ax, $0C08
+        int     21h
+ret
+
+
+InStr:          ;Ввод строки
+        push    ax
+        mov     ah, $0A
+        xchg    dx, di
+        int     21h
+
+        xchg    dx, di
+        pop     ax
+ret
+
+OutStr:         ;Вывод строки
+        push    ax
+        mov     ah, $09
+        xchg    dx, di
+        int     21h
+
+        xchg    dx, di
+        pop     ax
+ret
+
+Newline:        ;Переход на новую строку
+        push    ax
+        push    dx
+
+        mov     ah, $02
+        mov     dl,  $0A
+        int     21h
+
+        pop     dx
+        pop     ax
+ret
+
+segment MyProc
+
+Calc:
+        mov     ax,bx
+        mul     bx
+
+        add     ax,1
+        adc     dx,0
+
+        mov     bx,ax
+
+        movzx   eax, dx
+        shl     eax,16
+        mov     ax,bx
+
+        xor     edx,edx
+        xor     ebx, ebx
+        mov     bx, cx
+        xchg    eax,ebx
+        div     ebx
+
+        add     eax,1
+retf

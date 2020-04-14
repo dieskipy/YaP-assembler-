@@ -1,0 +1,46 @@
+program asmlab;
+
+{$APPTYPE CONSOLE}
+
+{$R *.res}
+
+uses
+  System.SysUtils;
+
+const
+  somearr:array[1..9] of char='123456789';
+  var
+  num,number:integer;
+
+begin
+   asm
+        mov di, somearr
+        mov cx,0
+        mov [number], 0
+
+      @oper1:
+         mov bx,di
+         add bx,cx
+         mov dx,0
+         mov dl,[bx]
+
+         push dx
+         shr dx,1
+         pop dx
+         jnc @metka
+
+         mov ah,02
+         inc [number]
+         int 21h
+      @metka:
+         inc cx
+         cmp cx,9
+         jne @oper1
+
+         mov cl,[number]
+         mov [num],cl
+         add [num],30h
+
+   end;
+   writeln('number of elements is: ', number);
+end.

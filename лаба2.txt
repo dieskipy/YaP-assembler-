@@ -1,0 +1,61 @@
+org 100h
+
+        mov di,somearr
+        mov [newarr],0
+        mov [coh],0
+        mov [col],0
+        mov [count],0
+
+someloop:
+        mov bh,[coh]
+        mov si,di
+        mov [col],bh
+        mov bh,[di]
+metka:
+        inc si
+        mov bl,[si]
+        cmp bh,bl
+        je equel
+
+        inc [col]
+        cmp [col],7
+        jne metka
+
+        cmp bh,[newarr]
+        je equel
+output1:
+        mov dl,bh
+        add dl,'0'
+        mov ah,02h
+        int 21h
+        inc [count]
+        jmp equel1
+equel:
+        mov [newarr],bh
+equel1:
+        inc di
+        inc [coh]
+        cmp [coh],7
+        jne someloop
+output2:
+        mov dx,newline
+        mov ah,09h
+        int 21h
+
+        mov dl,[count]
+        add dl,30h
+        mov ah,02h
+        int 21h
+
+        mov ah,08h
+        int 21h
+        ret
+
+
+
+somearr         db      1,2,3,2,5,2,7
+newarr          db      ?
+newline         db      10,13,'number of unic elements - ','$'
+count           db      ?
+coh             db      ?
+col             db      ?

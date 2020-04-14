@@ -1,0 +1,320 @@
+ org 100h
+
+Start:
+        mov     ah, $0F
+        int     10h
+
+        mov     [bOldMode], al
+        mov     [bOldPage], bh
+
+        mov ax,0013h
+        int 10h
+
+        push    $A000
+        pop     es
+
+;–исуем фон
+Looppage:
+        mov al, 3
+        xor di,di
+        mov cx,320*200
+        rep stosb
+
+prepare:
+        mov bx,320*20+115
+        mov dx,10
+        mov cx,90
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+        mov bx,320*30+95
+        mov dx,10
+        mov cx,20
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*30+205
+        mov dx,10
+        mov cx,20
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*20+115
+        mov dx,10
+        mov cx,90
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+
+mov bx,320*40+85
+        mov dx,20
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*40+225
+        mov dx,20
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*60+75
+        mov dx,40
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*60+235
+        mov dx,40
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*70+105
+        mov dx,30
+        mov cx,30
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*70+185
+        mov dx,30
+        mov cx,30
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*90+155
+        mov dx,10
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*100+145
+        mov dx,10
+        mov cx,30
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*100+85
+        mov dx,20
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*100+225
+        mov dx,20
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*120+75
+        mov dx,30
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*120+235
+        mov dx,30
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*150+85
+        mov dx,10
+        mov cx,20
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*150+215
+        mov dx,10
+        mov cx,20
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*160+105
+        mov dx,10
+        mov cx,20
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*160+195
+        mov dx,10
+        mov cx,20
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*170+125
+        mov dx,10
+        mov cx,70
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*110+205
+        mov dx,10
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*110+105
+        mov dx,10
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*130+135
+        mov dx,10
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*130+115
+        mov dx,10
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*130+155
+        mov dx,10
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*130+175
+        mov dx,10
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*130+195
+        mov dx,10
+        mov cx,10
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*120+105
+        mov dx,10
+        mov cx,110
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+mov bx,320*140+125
+        mov dx,10
+        mov cx,70
+        push bx
+        push dx
+        push cx
+        call MyProc
+
+;ќжидаем нажати€ клавиши
+        xor dx,dx
+        xor cx,cx
+        xor bx,bx
+
+        mov     ax, $0C08
+        int     21h
+        test    al, al
+        jnz     @F
+        mov     ah, $08
+        int     21h
+@@:
+
+        movzx   ax, [bOldMode]
+        int     10h
+        mov     ah, $05
+        mov     al, [bOldPage]
+        int     10h
+        ret
+
+;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+bOldMode        db      ?
+bOldPage        db      ?
+;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+MyProc:
+       push bp
+        mov bp,sp
+        push si
+        push di
+        push dx
+        push bx
+        push cx
+        mov dx,[bp+6]
+        mov bx,[bp+8]
+        mov si,[bp+4]
+
+.drawloop:
+        mov di,bx
+        mov cx,si
+
+.inloop:
+        mov al,0
+        rep stosb
+
+        add bx,320
+        dec dx
+        cmp dx,0
+        jne .drawloop
+
+        pop cx
+        pop bx
+        pop dx
+        pop di
+        pop si
+        pop bp
+        ret 6
